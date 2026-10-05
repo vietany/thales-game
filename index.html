@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kê Ván Đặt Hoa Trên Vòm Đá - Định Lý Ta-lét</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@600;800;900&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .font-brand {
+            font-family: 'Comfortaa', cursive;
+        }
+        .btn-bounce {
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+        }
+        .btn-bounce:hover {
+            transform: translateY(-2px);
+        }
+        .btn-bounce:active {
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body class="bg-emerald-50 min-h-screen text-slate-800 flex flex-col items-center justify-between p-2 sm:p-4">
+
+    <header class="w-full max-w-4xl flex items-center justify-between bg-white border-2 border-emerald-200 px-4 py-3 rounded-2xl shadow-sm mb-3">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-2xl font-black shadow-inner">
+                🌸
+            </div>
+            <div>
+                <h1 class="font-brand font-black text-emerald-950 text-lg sm:text-xl leading-tight">Vườn Hoa Vòm Đá</h1>
+                <p class="text-xs text-emerald-700 font-bold">Kê Ván Đặt Hoa Thăng Bằng &bull; Định Lý Ta-lét</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-100 text-emerald-900 px-3 py-1.5 rounded-xl font-black text-sm flex items-center gap-1.5 border border-emerald-200">
+                <span>Vòm đá:</span>
+                <span id="level-badge" class="bg-emerald-600 text-white px-2 py-0.5 rounded-lg">1 / 6</span>
+            </div>
+            <div class="bg-amber-50 text-amber-900 px-3 py-1.5 rounded-xl font-black text-sm flex items-center gap-1.5 border border-amber-200">
+                <span>⭐</span>
+                <span id="score-badge">0</span>
+            </div>
+            <div class="bg-sky-50 text-sky-900 px-3 py-1.5 rounded-xl font-black text-sm flex items-center gap-1.5 border border-sky-200">
+                <span>⏱️</span>
+                <span id="timer-badge">00:00</span>
+            </div>
+            <button id="sound-btn" class="w-9 h-9 bg-emerald-100 hover:bg-emerald-200 rounded-xl flex items-center justify-center text-base transition">
+                🔊
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl bg-white border-2 border-emerald-200 rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col items-center gap-4 flex-grow justify-center relative overflow-hidden">
+        
+        <div class="w-full flex justify-between items-center px-2">
+            <div id="mission-title" class="font-bold text-slate-800 text-sm sm:text-base">
+                Kê tấm ván DE song song với mặt đất BC để chậu hoa không bị trượt đổ
+            </div>
+            <div id="rule-hint" class="text-xs sm:text-sm bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-full border border-emerald-300">
+                Yêu cầu: DE // BC
+            </div>
+        </div>
+
+        <div class="relative w-full flex justify-center items-center bg-sky-100 rounded-2xl border-2 border-emerald-100 overflow-hidden shadow-inner" style="min-height: 410px;">
+            <canvas id="game-canvas" width="700" height="410" class="w-full max-w-[700px] h-[410px] block"></canvas>
+            
+            <!-- Quick Round Toast -->
+            <div id="feedback-overlay" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-white text-center hidden pointer-events-none">
+                <div id="feedback-icon" class="text-7xl mb-3 animate-bounce">🌸</div>
+                <h2 id="feedback-title" class="text-3xl font-black tracking-wide">THÀNH CÔNG!</h2>
+            </div>
+
+            <!-- Final Summary Screen -->
+            <div id="summary-overlay" class="absolute inset-0 bg-slate-900/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-white text-center hidden">
+                <div class="text-6xl mb-2">🏆</div>
+                <h2 class="text-3xl font-black text-amber-300 mb-1">HOÀN THÀNH THỬ THÁCH!</h2>
+                <p class="text-sm text-slate-300 mb-6 font-semibold">Bạn đã hoàn thành tất cả các bài toán kê ván bằng Định lý Ta-lét</p>
+                
+                <div class="grid grid-cols-3 gap-4 w-full max-w-md mb-6">
+                    <div class="bg-white/10 border border-white/20 p-3 rounded-2xl">
+                        <div class="text-xs text-emerald-300 font-bold mb-1">ĐIỂM SỐ</div>
+                        <div id="final-score" class="text-2xl font-black text-white">0</div>
+                    </div>
+                    <div class="bg-white/10 border border-white/20 p-3 rounded-2xl">
+                        <div class="text-xs text-sky-300 font-bold mb-1">THỜI GIAN</div>
+                        <div id="final-time" class="text-2xl font-black text-white">00:00</div>
+                    </div>
+                    <div class="bg-white/10 border border-white/20 p-3 rounded-2xl">
+                        <div class="text-xs text-rose-300 font-bold mb-1">CHÍNH XÁC</div>
+                        <div id="final-accuracy" class="text-2xl font-black text-white">0 / 6</div>
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3 rounded-2xl shadow-xl btn-bounce text-lg">
+                    Chơi Lại Từ Đầu ↺
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-col items-center gap-3">
+            <div class="text-center font-bold text-slate-700 text-sm sm:text-base">
+                Chọn khoảng cách thích hợp cho vị trí <span id="target-var" class="inline-block bg-emerald-200 text-emerald-950 px-2.5 py-0.5 rounded-lg font-black text-lg border border-emerald-300">?</span>:
+            </div>
+            <div id="options-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-2xl">
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full max-w-4xl text-center py-2 text-xs font-bold text-emerald-800">
+        Định lý Ta-lét trong tam giác: Nếu đường thẳng DE song song với cạnh đáy BC thì AD/DB = AE/EC.
+    </footer>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+
+        function playTone(freq, type, duration, delay = 0) {
+            if (!soundEnabled) return;
+            setTimeout(() => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch(e) {}
+            }, delay * 1000);
+        }
+
+        function playWinSound() {
+            playTone(523.25, 'triangle', 0.15, 0.0);
+            playTone(659.25, 'triangle', 0.15, 0.1);
+            playTone(783.99, 'triangle', 0.15, 0.2);
+            playTone(1046.50, 'triangle', 0.35, 0.3);
+        }
+
+        function playPlaceSound() {
+            playTone(320, 'sine', 0.08, 0.0);
+            playTone(480, 'sine', 0.1, 0.05);
+        }
+
+        function playSlideSound() {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(160, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch(e) {}
+        }
+
+        function playSmashSound() {
+            playTone(140, 'square', 0.12, 0.0);
+            playTone(80, 'sawtooth', 0.35, 0.06);
+        }
+
+        const levels = [
+            {
+                name: "Vòm đá suối mơ (6m - 9m)",
+                AD: 4,
+                DB: 2,
+                AE: 6,
+                EC: 3,
+                BC: 10,
+                target: 'EC',
+                display: { AD: '4 dm', DB: '2 dm', AE: '6 dm', EC: '?' },
+                formula: "AD / DB = AE / EC  =>  4 / 2 = 6 / ?",
+                result: 3,
+                options: [1.5, 3, 4.5, 6]
+            },
+            {
+                name: "Vách đá dốc đứng (9m - 7.5m)",
+                AD: 3,
+                DB: 6,
+                AE: 2.5,
+                EC: 5,
+                BC: 9.5,
+                target: 'AD',
+                display: { AD: '?', DB: '6 dm', AE: '2.5 dm', EC: '5 dm' },
+                formula: "AD / DB = AE / EC  =>  ? / 6 = 2.5 / 5",
+                result: 3,
+                options: [1.5, 3, 4, 5]
+            },
+            {
+                name: "Vòm đá cửa hang (10m - 8m)",
+                AD: 5,
+                DB: 5,
+                AE: 4,
+                EC: 4,
+                BC: 9,
+                target: 'AE',
+                display: { AD: '5 dm', DB: '5 dm', AE: '?', EC: '4 dm' },
+                formula: "AD / DB = AE / EC  =>  5 / 5 = ? / 4",
+                result: 4,
+                options: [2, 4, 5, 6]
+            },
+            {
+                name: "Vách đá sườn đồi (6m - 10.5m)",
+                AD: 2,
+                DB: 4,
+                AE: 3.5,
+                EC: 7,
+                BC: 11,
+                target: 'EC',
+                display: { AD: '2 dm', DB: '4 dm', AE: '3.5 dm', EC: '?' },
+                formula: "AD / DB = AE / EC  =>  2 / 4 = 3.5 / ?",
+                result: 7,
+                options: [3.5, 5, 7, 8]
+            },
+            {
+                name: "Vòm đá cổ thụ (9m - 12m)",
+                AD: 6,
+                DB: 3,
+                AE: 8,
+                EC: 4,
+                BC: 13,
+                target: 'DB',
+                display: { AD: '6 dm', DB: '?', AE: '8 dm', EC: '4 dm' },
+                formula: "AD / DB = AE / EC  =>  6 / ? = 8 / 4",
+                result: 3,
+                options: [2, 3, 4.5, 6]
+            },
+            {
+                name: "Vòm đá đón nắng (7.5m - 10m)",
+                AD: 4.5,
+                DB: 3,
+                AE: 6,
+                EC: 4,
+                BC: 11,
+                target: 'AE',
+                display: { AD: '4.5 dm', DB: '3 dm', AE: '?', EC: '4 dm' },
+                formula: "AD / DB = AE / EC  =>  4.5 / 3 = ? / 4",
+                result: 6,
+                options: [3, 4.5, 6, 7.5]
+            }
+        ];
+
+        function calculateTriangleGeometry(lv) {
+            const AB = lv.AD + lv.DB;
+            const AC = lv.AE + lv.EC;
+            const BC = lv.BC;
+
+            const cosB = (AB * AB + BC * BC - AC * AC) / (2 * AB * BC);
+            const sinB = Math.sqrt(Math.max(0, 1 - cosB * cosB));
+
+            const h = AB * sinB;
+            const dX = AB * cosB;
+
+            const baseLineY = 320;
+            const maxPixelHeight = 220;
+            const maxPixelWidth = 420;
+
+            const scaleY = maxPixelHeight / h;
+            const scaleX = maxPixelWidth / BC;
+            const scale = Math.min(scaleX, scaleY);
+
+            const pixelBC = BC * scale;
+            const leftX = (700 - pixelBC) / 2;
+            const rightX = leftX + pixelBC;
+
+            const apexX = leftX + dX * scale;
+            const apexY = baseLineY - h * scale;
+
+            return {
+                A: { x: apexX, y: apexY },
+                B: { x: leftX, y: baseLineY },
+                C: { x: rightX, y: baseLineY }
+            };
+        }
+
+        let currentLevel = 0;
+        let score = 0;
+        let correctCount = 0;
+        let state = 'IDLE';
+        let chosenValue = null;
+        let isCorrect = false;
+
+        let startTime = null;
+        let timerInterval = null;
+        let totalElapsedSeconds = 0;
+
+        let rotateStartTime = 0;
+        const ROTATE_DURATION = 650;
+
+        let shakeStartTime = 0;
+        const SHAKE_DURATION = 500;
+
+        let slideStartTime = 0;
+        const SLIDE_DURATION = 1200;
+
+        let currentHangAngle = Math.PI / 2;
+        let startRotateAngle = Math.PI / 2;
+        let targetAngle = 0;
+        let tiltDirection = 1;
+
+        let potPieces = [];
+
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const levelBadge = document.getElementById('level-badge');
+        const scoreBadge = document.getElementById('score-badge');
+        const timerBadge = document.getElementById('timer-badge');
+        const optionsGrid = document.getElementById('options-grid');
+        const targetVar = document.getElementById('target-var');
+        const missionTitle = document.getElementById('mission-title');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const summaryOverlay = document.getElementById('summary-overlay');
+        const finalScore = document.getElementById('final-score');
+        const finalTime = document.getElementById('final-time');
+        const finalAccuracy = document.getElementById('final-accuracy');
+        const restartBtn = document.getElementById('restart-btn');
+        const soundBtn = document.getElementById('sound-btn');
+
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.innerText = soundEnabled ? '🔊' : '🔇';
+        });
+
+        function formatTime(totalSec) {
+            const m = Math.floor(totalSec / 60).toString().padStart(2, '0');
+            const s = (totalSec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                totalElapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                timerBadge.innerText = formatTime(totalElapsedSeconds);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function loadLevel(idx) {
+            currentLevel = idx;
+            state = 'IDLE';
+            chosenValue = null;
+            potPieces = [];
+            feedbackOverlay.classList.add('hidden');
+
+            const lv = levels[currentLevel];
+            const geom = calculateTriangleGeometry(lv);
+            lv.A = geom.A;
+            lv.B = geom.B;
+            lv.C = geom.C;
+
+            levelBadge.innerText = `${currentLevel + 1} / ${levels.length}`;
+            missionTitle.innerText = `Cảnh quan: ${lv.name} - Tính vị trí kê ván ${lv.target}`;
+            targetVar.innerText = lv.target + ' = ?';
+
+            optionsGrid.innerHTML = '';
+            lv.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-emerald-50 hover:bg-emerald-600 hover:text-white border-2 border-emerald-300 text-emerald-950 font-black py-3 rounded-2xl text-lg shadow-sm btn-bounce';
+                btn.innerText = opt + ' dm';
+                btn.addEventListener('click', () => handleChoice(opt));
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function handleChoice(val) {
+            if (state !== 'IDLE') return;
+            chosenValue = val;
+            const lv = levels[currentLevel];
+            isCorrect = Math.abs(val - lv.result) < 0.001;
+
+            const targetOnLeft = (lv.target === 'AD' || lv.target === 'DB');
+
+            let rLeft = lv.AD / (lv.AD + lv.DB);
+            let rRight = lv.AE / (lv.AE + lv.EC);
+
+            if (targetOnLeft) {
+                let curAD = lv.AD;
+                let curDB = lv.DB;
+                if (lv.target === 'AD') curAD = chosenValue;
+                if (lv.target === 'DB') curDB = chosenValue;
+                rLeft = Math.min(0.92, Math.max(0.08, curAD / (curAD + curDB)));
+            } else {
+                let curAE = lv.AE;
+                let curEC = lv.EC;
+                if (lv.target === 'AE') curAE = chosenValue;
+                if (lv.target === 'EC') curEC = chosenValue;
+                rRight = Math.min(0.92, Math.max(0.08, curAE / (curAE + curEC)));
+            }
+
+            const ptD = getInterpolatedPoint(lv.A, lv.B, rLeft);
+            const ptE = getInterpolatedPoint(lv.A, lv.C, rRight);
+
+            if (targetOnLeft) {
+                targetAngle = Math.atan2(ptD.y - ptE.y, ptD.x - ptE.x);
+            } else {
+                targetAngle = Math.atan2(ptE.y - ptD.y, ptE.x - ptD.x);
+            }
+
+            startRotateAngle = currentHangAngle;
+            rotateStartTime = performance.now();
+            state = 'ROTATING';
+
+            tiltDirection = rRight > rLeft ? 1 : -1;
+        }
+
+        function createPotDebris(x, y) {
+            potPieces = [];
+            for (let i = 0; i < 20; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const spd = 2 + Math.random() * 6;
+                potPieces.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * spd,
+                    vy: Math.sin(angle) * spd - 3,
+                    rot: Math.random() * Math.PI * 2,
+                    vrot: (Math.random() - 0.5) * 0.3,
+                    size: 6 + Math.random() * 8,
+                    color: Math.random() > 0.4 ? '#b45309' : (Math.random() > 0.5 ? '#f43f5e' : '#78350f')
+                });
+            }
+        }
+
+        function showResultToast(success) {
+            feedbackOverlay.classList.remove('hidden');
+
+            if (success) {
+                feedbackIcon.innerText = '🌸';
+                feedbackTitle.innerText = 'THÀNH CÔNG!';
+                feedbackTitle.className = 'text-4xl font-black tracking-wide text-emerald-400 animate-pulse';
+            } else {
+                feedbackIcon.innerText = '🥀';
+                feedbackTitle.innerText = 'THẤT BẠI!';
+                feedbackTitle.className = 'text-4xl font-black tracking-wide text-rose-400 animate-pulse';
+            }
+
+            setTimeout(() => {
+                feedbackOverlay.classList.add('hidden');
+                goToNextQuestion();
+            }, 1200);
+        }
+
+        function goToNextQuestion() {
+            if (currentLevel + 1 < levels.length) {
+                loadLevel(currentLevel + 1);
+            } else {
+                stopTimer();
+                showFinalSummary();
+            }
+        }
+
+        function showFinalSummary() {
+            state = 'FINISHED';
+            finalScore.innerText = score;
+            finalTime.innerText = formatTime(totalElapsedSeconds);
+            finalAccuracy.innerText = `${correctCount} / ${levels.length}`;
+            summaryOverlay.classList.remove('hidden');
+        }
+
+        restartBtn.addEventListener('click', () => {
+            summaryOverlay.classList.add('hidden');
+            score = 0;
+            correctCount = 0;
+            scoreBadge.innerText = '0';
+            timerBadge.innerText = '00:00';
+            totalElapsedSeconds = 0;
+            startTimer();
+            loadLevel(0);
+        });
+
+        function getInterpolatedPoint(p1, p2, ratio) {
+            return {
+                x: p1.x + (p2.x - p1.x) * ratio,
+                y: p1.y + (p2.y - p1.y) * ratio
+            };
+        }
+
+        function draw(now) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const lv = levels[currentLevel];
+
+            ctx.fillStyle = '#bae6fd';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(630, 70, 38, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(0, 320, canvas.width, 90);
+            ctx.fillStyle = '#16a34a';
+            ctx.fillRect(0, 320, canvas.width, 14);
+
+            drawMountainRock(lv.A, lv.B, lv.C);
+
+            const targetOnLeft = (lv.target === 'AD' || lv.target === 'DB');
+
+            const refRatioLeft = lv.AD / (lv.AD + lv.DB);
+            const refRatioRight = lv.AE / (lv.AE + lv.EC);
+            const refPtD = getInterpolatedPoint(lv.A, lv.B, refRatioLeft);
+            const refPtE = getInterpolatedPoint(lv.A, lv.C, refRatioRight);
+
+            let dynPtD = { x: refPtD.x, y: refPtD.y };
+            let dynPtE = { x: refPtE.x, y: refPtE.y };
+
+            if (chosenValue !== null) {
+                if (targetOnLeft) {
+                    let curAD = lv.AD;
+                    let curDB = lv.DB;
+                    if (lv.target === 'AD') curAD = chosenValue;
+                    if (lv.target === 'DB') curDB = chosenValue;
+                    const r = Math.min(0.92, Math.max(0.08, curAD / (curAD + curDB)));
+                    dynPtD = getInterpolatedPoint(lv.A, lv.B, r);
+                } else {
+                    let curAE = lv.AE;
+                    let curEC = lv.EC;
+                    if (lv.target === 'AE') curAE = chosenValue;
+                    if (lv.target === 'EC') curEC = chosenValue;
+                    const r = Math.min(0.92, Math.max(0.08, curAE / (curAE + curEC)));
+                    dynPtE = getInterpolatedPoint(lv.A, lv.C, r);
+                }
+            }
+
+            const beamLen = Math.hypot(refPtE.x - refPtD.x, refPtE.y - refPtD.y);
+
+            let curPtD = { x: refPtD.x, y: refPtD.y };
+            let curPtE = { x: refPtE.x, y: refPtE.y };
+
+            let plankShakeY = 0;
+            let potX = (curPtD.x + curPtE.x) / 2;
+            let potY = (curPtD.y + curPtE.y) / 2;
+            let potAngle = 0;
+            let showPot = false;
+            let potBroken = false;
+
+            if (state === 'IDLE') {
+                const swing = Math.sin(now * 0.0035) * 0.12;
+                currentHangAngle = (Math.PI / 2) + swing;
+
+                if (targetOnLeft) {
+                    curPtE = { x: refPtE.x, y: refPtE.y };
+                    curPtD.x = refPtE.x + Math.cos(Math.PI - currentHangAngle) * (beamLen * 0.7);
+                    curPtD.y = refPtE.y + Math.sin(Math.PI - currentHangAngle) * (beamLen * 0.7);
+                } else {
+                    curPtD = { x: refPtD.x, y: refPtD.y };
+                    curPtE.x = refPtD.x + Math.cos(currentHangAngle) * (beamLen * 0.7);
+                    curPtE.y = refPtD.y + Math.sin(currentHangAngle) * (beamLen * 0.7);
+                }
+            } else if (state === 'ROTATING') {
+                const elapsed = now - rotateStartTime;
+                const p = Math.min(1, elapsed / ROTATE_DURATION);
+                const ease = p * (2 - p);
+                const curAngle = startRotateAngle + (targetAngle - startRotateAngle) * ease;
+                const curLen = (beamLen * 0.7) + (beamLen * 0.3) * ease;
+
+                if (targetOnLeft) {
+                    curPtE = { x: refPtE.x, y: refPtE.y };
+                    curPtD.x = refPtE.x + Math.cos(curAngle) * curLen;
+                    curPtD.y = refPtE.y + Math.sin(curAngle) * curLen;
+                } else {
+                    curPtD = { x: refPtD.x, y: refPtD.y };
+                    curPtE.x = refPtD.x + Math.cos(curAngle) * curLen;
+                    curPtE.y = refPtD.y + Math.sin(curAngle) * curLen;
+                }
+
+                if (p >= 1) {
+                    state = 'SHAKING';
+                    shakeStartTime = now;
+                    playPlaceSound();
+                }
+            } else if (state === 'SHAKING') {
+                curPtD = { x: dynPtD.x, y: dynPtD.y };
+                curPtE = { x: dynPtE.x, y: dynPtE.y };
+                showPot = true;
+                const elapsed = now - shakeStartTime;
+                const p = Math.min(1, elapsed / SHAKE_DURATION);
+
+                plankShakeY = Math.sin(now * 0.08) * 3 * (1 - p);
+
+                potAngle = Math.atan2(curPtE.y - curPtD.y, curPtE.x - curPtD.x);
+                potX = (curPtD.x + curPtE.x) / 2;
+                potY = (curPtD.y + curPtE.y) / 2 + plankShakeY;
+
+                if (p >= 1) {
+                    if (isCorrect) {
+                        state = 'SUCCESS';
+                        score += 100;
+                        correctCount++;
+                        scoreBadge.innerText = score;
+                        playWinSound();
+                        showResultToast(true);
+                    } else {
+                        state = 'SLIDING';
+                        slideStartTime = now;
+                        playSlideSound();
+                    }
+                }
+            } else if (state === 'SUCCESS') {
+                curPtD = { x: dynPtD.x, y: dynPtD.y };
+                curPtE = { x: dynPtE.x, y: dynPtE.y };
+                showPot = true;
+                potAngle = Math.atan2(curPtE.y - curPtD.y, curPtE.x - curPtD.x);
+                potX = (curPtD.x + curPtE.x) / 2;
+                potY = (curPtD.y + curPtE.y) / 2;
+            } else if (state === 'SLIDING') {
+                curPtD = { x: dynPtD.x, y: dynPtD.y };
+                curPtE = { x: dynPtE.x, y: dynPtE.y };
+                const elapsed = now - slideStartTime;
+                const p = Math.min(1, elapsed / SLIDE_DURATION);
+
+                potAngle = Math.atan2(curPtE.y - curPtD.y, curPtE.x - curPtD.x);
+
+                if (p < 0.6) {
+                    showPot = true;
+                    const slideEase = (p / 0.6) * (p / 0.6);
+                    const midX = (curPtD.x + curPtE.x) / 2;
+                    const midY = (curPtD.y + curPtE.y) / 2;
+                    const lowEnd = tiltDirection > 0 ? curPtE : curPtD;
+
+                    potX = midX + (lowEnd.x - midX) * slideEase * 1.2;
+                    potY = midY + (lowEnd.y - midY) * slideEase * 1.2;
+                } else if (p < 0.85) {
+                    showPot = true;
+                    const fallP = (p - 0.6) / 0.25;
+                    const lowEnd = tiltDirection > 0 ? curPtE : curPtD;
+                    potX = lowEnd.x + tiltDirection * 15;
+                    potY = lowEnd.y + fallP * (320 - lowEnd.y);
+                    potAngle += fallP * 2;
+                } else {
+                    showPot = false;
+                    potBroken = true;
+
+                    if (potPieces.length === 0) {
+                        const lowEnd = tiltDirection > 0 ? curPtE : curPtD;
+                        createPotDebris(lowEnd.x + tiltDirection * 15, 320);
+                        playSmashSound();
+                    }
+
+                    if (p >= 1 && feedbackOverlay.classList.contains('hidden')) {
+                        showResultToast(false);
+                    }
+                }
+            }
+
+            drawSideRuler(lv.A, lv.B, lv.display.AD, lv.display.DB, refRatioLeft, lv.target === 'AD', lv.target === 'DB', lv.C);
+            drawSideRuler(lv.A, lv.C, lv.display.AE, lv.display.EC, refRatioRight, lv.target === 'AE', lv.target === 'EC', lv.B);
+
+            drawJointNotch(refPtD.x, refPtD.y);
+            drawJointNotch(refPtE.x, refPtE.y);
+
+            ctx.save();
+            ctx.translate(0, plankShakeY);
+
+            let plankColor = '#b45309';
+            if (state === 'SUCCESS') plankColor = '#059669';
+            if (state === 'SLIDING') plankColor = '#e11d48';
+
+            ctx.strokeStyle = plankColor;
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(curPtD.x, curPtD.y);
+            ctx.lineTo(curPtE.x, curPtE.y);
+            ctx.stroke();
+
+            ctx.fillStyle = '#fde68a';
+            ctx.fillRect(curPtD.x - 4, curPtD.y - 4, 8, 8);
+            ctx.fillRect(curPtE.x - 4, curPtE.y - 4, 8, 8);
+
+            ctx.restore();
+
+            if (showPot) {
+                drawFlowerPot(potX, potY, potAngle, state === 'SUCCESS');
+            }
+
+            if (potBroken) {
+                potPieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3;
+                    p.rot += p.vrot;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+            }
+
+            drawPointLabel('A (Chóp vòm đá)', lv.A.x, lv.A.y - 20);
+            drawPointLabel('B', lv.B.x - 16, lv.B.y + 18);
+            drawPointLabel('C', lv.C.x + 16, lv.C.y + 18);
+            drawPointLabel('D', refPtD.x - 18, refPtD.y - 12);
+            drawPointLabel('E', refPtE.x + 18, refPtE.y - 12);
+
+            drawBaseBanner((lv.B.x + lv.C.x) / 2, 345, "Mặt đất phẳng BC (Phương thăng bằng)");
+
+            if (state === 'SUCCESS') {
+                drawSparkles(now, (curPtD.x + curPtE.x) / 2, (curPtD.y + curPtE.y) / 2 - 35);
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        function drawMountainRock(A, B, C) {
+            ctx.save();
+
+            ctx.fillStyle = 'rgba(254, 243, 199, 0.4)';
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y);
+            ctx.lineTo(B.x, B.y);
+            ctx.lineTo(C.x, C.y);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 18;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(B.x, B.y);
+            ctx.lineTo(A.x, A.y);
+            ctx.lineTo(C.x, C.y);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(B.x, B.y);
+            ctx.lineTo(A.x, A.y);
+            ctx.lineTo(C.x, C.y);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawFlowerPot(x, y, angle, isHappy) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+
+            ctx.fillStyle = '#ea580c';
+            ctx.beginPath();
+            ctx.moveTo(-14, -6);
+            ctx.lineTo(14, -6);
+            ctx.lineTo(10, -26);
+            ctx.lineTo(-10, -26);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#c2410c';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(-12, -28, 24, 4);
+
+            ctx.fillStyle = '#16a34a';
+            ctx.beginPath();
+            ctx.ellipse(-8, -32, 6, 3, -0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(8, -32, 6, 3, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            const flowerColor = isHappy ? '#ec4899' : '#f43f5e';
+            ctx.fillStyle = flowerColor;
+            ctx.beginPath();
+            ctx.arc(0, -36, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.arc(0, -36, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawJointNotch(x, y) {
+            ctx.fillStyle = '#334155';
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawPointLabel(txt, x, y) {
+            ctx.font = '800 13px Nunito';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, x, y);
+        }
+
+        function drawSideRuler(p1, p2, txt1, txt2, ratio, isT1, isT2, oppositePt) {
+            const edgeDx = p2.x - p1.x;
+            const edgeDy = p2.y - p1.y;
+            const edgeLen = Math.hypot(edgeDx, edgeDy);
+            const ux = edgeDx / edgeLen;
+            const uy = edgeDy / edgeLen;
+
+            let nx = -uy;
+            let ny = ux;
+
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+            const dot = (oppositePt.x - midX) * nx + (oppositePt.y - midY) * ny;
+            if (dot > 0) {
+                nx = -nx;
+                ny = -ny;
+            }
+
+            const offsetDist = 48;
+            const lineP1 = { x: p1.x + nx * offsetDist, y: p1.y + ny * offsetDist };
+            const lineP2 = { x: p2.x + nx * offsetDist, y: p2.y + ny * offsetDist };
+
+            const divPt = getInterpolatedPoint(p1, p2, ratio);
+            const lineDiv = { x: divPt.x + nx * offsetDist, y: divPt.y + ny * offsetDist };
+
+            ctx.save();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y); ctx.lineTo(lineP1.x, lineP1.y);
+            ctx.moveTo(divPt.x, divPt.y); ctx.lineTo(lineDiv.x, lineDiv.y);
+            ctx.moveTo(p2.x, p2.y); ctx.lineTo(lineP2.x, lineP2.y);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.setLineDash([]);
+            ctx.moveTo(lineP1.x, lineP1.y); ctx.lineTo(lineDiv.x, lineDiv.y);
+            ctx.moveTo(lineDiv.x, lineDiv.y); ctx.lineTo(lineP2.x, lineP2.y);
+            ctx.stroke();
+
+            const tickLen = 4;
+            [lineP1, lineDiv, lineP2].forEach(p => {
+                ctx.beginPath();
+                ctx.moveTo(p.x - nx * tickLen, p.y - ny * tickLen);
+                ctx.lineTo(p.x + nx * tickLen, p.y + ny * tickLen);
+                ctx.stroke();
+            });
+            ctx.restore();
+
+            let angle = Math.atan2(edgeDy, edgeDx);
+            if (angle > Math.PI / 2) angle -= Math.PI;
+            if (angle < -Math.PI / 2) angle += Math.PI;
+
+            const m1 = { x: (lineP1.x + lineDiv.x) / 2, y: (lineP1.y + lineDiv.y) / 2 };
+            const m2 = { x: (lineDiv.x + lineP2.x) / 2, y: (lineDiv.y + lineP2.y) / 2 };
+
+            drawAngledBadge(m1.x, m1.y, txt1, isT1, angle);
+            drawAngledBadge(m2.x, m2.y, txt2, isT2, angle);
+        }
+
+        function drawAngledBadge(x, y, txt, isTarget, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+
+            ctx.font = '800 13px Nunito';
+            const w = ctx.measureText(txt).width + 16;
+            const h = 24;
+
+            ctx.fillStyle = isTarget ? '#e11d48' : '#ffffff';
+            ctx.strokeStyle = isTarget ? '#fda4af' : '#cbd5e1';
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.roundRect(-w / 2, -h / 2, w, h, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = isTarget ? '#ffffff' : '#0f172a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, 0, 0);
+
+            ctx.restore();
+        }
+
+        function drawBaseBanner(x, y, txt) {
+            ctx.save();
+            ctx.font = '700 12px Nunito';
+            const w = ctx.measureText(txt).width + 20;
+            const h = 24;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#16a34a';
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.roundRect(x - w / 2, y - h / 2, w, h, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#15803d';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, x, y);
+            ctx.restore();
+        }
+
+        function drawSparkles(t, cx, cy) {
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2 + t * 0.003;
+                const dist = 24 + Math.sin(t * 0.01 + i) * 12;
+                const px = cx + Math.cos(angle) * dist;
+                const py = cy + Math.sin(angle) * dist;
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        startTimer();
+        loadLevel(0);
+        requestAnimationFrame(draw);
+    </script>
+</body>
+</html>
