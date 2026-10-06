@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@600;800;900&display=swap');
+
+:root {
+    --c-sky: #bae6fd;
+    --c-sun: #fef08a;
+    --c-grass: #4ade80;
+    --c-grass-edge: #16a34a;
+    --c-rock-fill: rgba(254, 243, 199, 0.4);
+    --c-rock-outer: #64748b;
+    --c-rock-inner: #94a3b8;
+    --c-notch-fill: #334155;
+    --c-notch-stroke: #e2e8f0;
+    --c-plank-wood: #b45309;
+    --c-plank-win: #059669;
+    --c-plank-lose: #e11d48;
+    --c-peg: #fde68a;
+    --c-pot-clay: #ea580c;
+    --c-pot-stroke: #c2410c;
+    --c-pot-soil: #78350f;
+    --c-plant-leaf: #16a34a;
+    --c-flower-happy: #ec4899;
+    --c-flower-sad: #f43f5e;
+    --c-flower-center: #fde047;
+    --c-sparkle: #f59e0b;
+    --c-text-dark: #1e293b;
+    --c-badge-stroke: #cbd5e1;
+    --c-badge-target-fill: #e11d48;
+    --c-badge-target-stroke: #fda4af;
+    --c-banner-fill: #ffffff;
+    --c-banner-stroke: #16a34a;
+    --c-banner-text: #15803d;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.font-brand {
+    font-family: 'Comfortaa', cursive;
+}
+
+.btn-bounce {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+}
+
+.btn-bounce:hover {
+    transform: translateY(-2px);
+}
+
+.btn-bounce:active {
+    transform: translateY(2px);
+}
